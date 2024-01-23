@@ -18,12 +18,6 @@
 static const char map_name[] = "filter_ethernet";
 
 /**
- * @brief Ethernet null addr used for comparaison
- * 
- */
-static const unsigned char eth_addr_null[ETH_ALEN] = {0};
-
-/**
  * @brief Filling a BPF eth map struct from CLI values
  * 
  * @param k 

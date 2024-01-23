@@ -1,6 +1,13 @@
 #ifndef __COMMAND_PORT_H__
 #define __COMMAND_PORT_H__
 
+typedef struct command_port_add_s {
+    char *ifname;
+    char *src;
+    char *dst;
+    char *proto;
+} command_port_add_t;
+
 /**
  * @brief Command port add process
  * 
