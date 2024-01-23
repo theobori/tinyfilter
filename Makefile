@@ -11,7 +11,10 @@ USER_C = $(SRC_DIR)/main.c \
 		 $(SRC_DIR)/command/unload/unload.c \
 		 $(SRC_DIR)/command/help/help.c \
 		 $(SRC_DIR)/command/command.c \
+		 $(SRC_DIR)/command/common/common.c \
 		 $(SRC_DIR)/command/ip/ip.c \
+		 $(SRC_DIR)/command/eth/eth.c \
+		 $(SRC_DIR)/command/port/port.c \
 		 $(SRC_DIR)/common/common.c \
 		 $(SRC_DIR)/common/bpf/bpf.c \
 		 $(SRC_DIR)/common/xdp/xdp.c

@@ -40,7 +40,7 @@ struct {
 	__type(key, filter_key_eth_t);
 	__type(value, filter_value_t);
 	__uint(max_entries, 32);
-} filter_eth SEC(".maps");
+} filter_ethernet SEC(".maps");
 
 /**
  * @brief IP filters
@@ -117,18 +117,18 @@ struct {
 static __always_inline int filter_udp_xdp_action(
     struct hdr_cursor *nh, void *data_end, __u8 proto)
 {
-    int len;
-    struct udphdr *udp;
+    struct udphdr *udp = nh->pos;
+
+	if (udp + 1 > (struct udphdr *) data_end)
+		return XDP_DROP;
+
+	nh->pos = udp + 1;
     
-    len = parse_udphdr(nh, data_end, &udp);
-    if (len == -1)
-        return XDP_DROP;
-    
-    filter_key_port_t k;
+    filter_key_port_t k = {0};
     k.proto = proto;
 
-    __u16 src = bpf_htons(udp->source);
-    __u16 dst = bpf_htons(udp->dest);
+    __u16 src = bpf_ntohs(udp->source);
+    __u16 dst = bpf_ntohs(udp->dest);
 
     COMMON_CHECK(filter_port, k, &src, &dst)
     return MATCH_KO;
@@ -203,9 +203,9 @@ static __always_inline int filter_l2(
 
     *proto = bpf_htons(*proto);
 
-    filter_key_eth_t k;
+    filter_key_eth_t k = {0};
 
-    COMMON_CHECK(filter_eth, k, eth->h_source, eth->h_dest)
+    COMMON_CHECK(filter_ethernet, k, eth->h_source, eth->h_dest)
     return MATCH_KO;
 }
 

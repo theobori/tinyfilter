@@ -11,7 +11,6 @@
 typedef struct filter_key_eth_s {
 	__u8 dst[ETH_ALEN];
 	__u8 src[ETH_ALEN];
-    __u8 unused[2];
 } filter_key_eth_t;
 
 /**

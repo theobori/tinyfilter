@@ -16,22 +16,23 @@
  * @brief BPF map name
  * 
  */
-static const char map_name[] = "filter_ip";
+static const char map_name[] = "filter_port";
 
 /**
- * @brief Filling a BPF ip map struct from CLI values
+ * @brief Filling a BPF port map struct from CLI values
  * 
  * @param k 
  * @param cfg 
  * @return int 
  */
-static int ip_fill(filter_key_ip_t *k, command_common_add_t *cfg)
+static int port_fill(filter_key_port_t *k, command_common_add_t *cfg)
 {
     if (!cfg || !k)
         return EXIT_FAILURE;
     
-    k->dst = ip4_raw_value(cfg->dst);
-    k->src = ip4_raw_value(cfg->src);
+    k->dst = port_raw_value(cfg->dst);
+    k->src = port_raw_value(cfg->src);
+    k->proto = IPPROTO_TCP;
 
     if (!k->src && !k->dst)
         return EXIT_FAILURE;
@@ -40,15 +41,15 @@ static int ip_fill(filter_key_ip_t *k, command_common_add_t *cfg)
 }
 
 /**
- * @brief Command ip pre process (add/del)
+ * @brief Command port pre process (add/del)
  * 
  * @param argc 
  * @param argv 
  * @param k 
  * @return int 
  */
-static int command_ip_pre_process(int argc, const char *argv[],
-    filter_key_ip_t *k)
+static int command_port_pre_process(int argc, const char *argv[],
+    filter_key_port_t *k)
 {
     int err, map_fd;
     command_common_add_t cfg;
@@ -61,19 +62,19 @@ static int command_ip_pre_process(int argc, const char *argv[],
     if (map_fd < 0)
         return -1;
 
-    err = ip_fill(k, &cfg);
+    err = port_fill(k, &cfg);
     if (err)
         return -1;
     
     return map_fd;
 }
 
-int command_ip_add_process(int argc, const char *argv[])
+int command_port_add_process(int argc, const char *argv[])
 {
     int err, map_fd;
-    filter_key_ip_t k;
+    filter_key_port_t k = {0};
 
-    map_fd = command_ip_pre_process(argc, argv, &k);
+    map_fd = command_port_pre_process(argc, argv, &k);
     if (map_fd < 0)
         return EXIT_FAILURE;
 
@@ -86,12 +87,12 @@ int command_ip_add_process(int argc, const char *argv[])
     return EXIT_SUCCESS;
 }
 
-int command_ip_remove_process(int argc, const char *argv[])
+int command_port_remove_process(int argc, const char *argv[])
 {
     int err, map_fd;
-    filter_key_ip_t k;
+    filter_key_port_t k = {0};
 
-    map_fd = command_ip_pre_process(argc, argv, &k);
+    map_fd = command_port_pre_process(argc, argv, &k);
     if (map_fd < 0)
         return EXIT_FAILURE;
     
@@ -102,35 +103,27 @@ int command_ip_remove_process(int argc, const char *argv[])
     return EXIT_SUCCESS;
 }
 
-static void print_filter(filter_key_ip_t *k, filter_value_t *v)
+static void print_filter(filter_key_port_t *k, filter_value_t *v)
 {
-    unsigned int ip_host_order;
-    char str[INET6_ADDRSTRLEN];
-
-    if (k->src) {
-        ip_host_order = ntohl(k->src);
-        ip_string_value(AF_INET, (char *) &ip_host_order, str);
-        printf("From %s", str);
-    }
+    if (k->src)
+        printf("Protocol %hu, from %hu", k->proto, k->src);
 
     if (k->dst) {
-        ip_host_order = ntohl(k->dst);
-        ip_string_value(AF_INET, (char *) &ip_host_order, str);
-
         if (k->src)
             printf(" to ");
         else
-            printf("To ");
+            printf("Protocol %hu, To ", k->proto);
 
-        printf("%s", str);
+        printf("%hu", k->dst);
     }
 
     printf(", %llu matches\n", v->count);
 }
 
-int command_ip_filters_process(int argc, const char *argv[])
+int command_port_filters_process(int argc, const char *argv[])
 {
     int err, map_fd;
+
     unsigned long long key, prev_key, value;
 
     command_common_filters_t cfg = command_common_filters_configure(argc, argv);
@@ -143,11 +136,10 @@ int command_ip_filters_process(int argc, const char *argv[])
     
     while (!bpf_map_get_next_key(map_fd, &prev_key, &key)) {
         err = bpf_map_lookup_elem(map_fd, &key, &value);
-
         if (err < 0)
             continue;
 
-        print_filter((filter_key_ip_t *) &key, (filter_value_t *) &value);
+        print_filter((filter_key_port_t *) &key, (filter_value_t *) &value);
 
         prev_key = key;
     }

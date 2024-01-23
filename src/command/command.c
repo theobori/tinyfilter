@@ -3,6 +3,29 @@
 
 #include "./command.h"
 #include "./ip/ip.h"
+#include "./eth/eth.h"
+#include "./port/port.h"
+
+/**
+ * @brief Commands port skeleton
+ * 
+ */
+static command_entry_t commands_port[] = {
+    { "add", command_port_add_process, NULL },
+    { "del", command_port_remove_process, NULL },
+    { "filters", command_port_filters_process, NULL },
+    { "", NULL, NULL },
+};
+
+/**
+ * @brief Commands eth skeleton
+ * 
+ */
+static command_entry_t commands_eth[] = {
+    { "add", command_eth_add_process, NULL },
+    { "del", command_eth_remove_process, NULL },
+    { "", NULL, NULL },
+};
 
 /**
  * @brief Commands ip skeleton
@@ -11,7 +34,7 @@
 static command_entry_t commands_ip[] = {
     { "add", command_ip_add_process, NULL },
     { "del", command_ip_remove_process, NULL },
-    { "show", command_ip_show_process, NULL },
+    { "filters", command_ip_filters_process, NULL },
     { "", NULL, NULL },
 };
 
@@ -23,6 +46,8 @@ static command_entry_t commands[] = {
     { "load", command_load_process, NULL },
     { "unload", command_unload_process, NULL },
     { "ip", NULL, commands_ip },
+    { "eth", NULL, commands_eth },
+    { "port", NULL, commands_port },
     { "", NULL, NULL },
 };
 

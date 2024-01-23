@@ -69,7 +69,7 @@ int common_bpf_pinned_map(const char *prog_dirname,
 	if (err < 0)
 		return -1;
     
-    return bpf_obj_get(map_path);
+    map_fd = bpf_obj_get(map_path);
     if (map_fd < 0)
         return -1;
     

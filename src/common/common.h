@@ -3,10 +3,13 @@
 
 #include <linux/types.h>
 
+
+#define ETH_STR_LEN 18
+
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 /**
- * @brief Convert IP from string to its raw value
+ * @brief Convert IP address from string to its raw value
  * 
  * @param af 
  * @param src 
@@ -17,11 +20,45 @@
 int ip_raw_value(int af, const char *src, void *dest, unsigned int size);
 
 /**
- * @brief Return the IPv4 raw value as an unsigned int
+ * @brief Return the IPv4 address raw value as an unsigned int
  * 
  * @param src 
  * @return unsigned int 
  */
 unsigned int ip4_raw_value(const char *src);
+
+/**
+ * @brief Return an IP address value as a string
+ * 
+ * @param af 
+ * @param src 
+ * @param dest 
+ * @return int 
+ */
+int ip_string_value(int af, const char *buf, char *dest);
+
+/**
+ * @brief Convert Ethernet address from string to raw bytes
+ * 
+ * @param src 
+ * @param dest 
+ * @return int 
+ */
+int eth_raw_value(const char *src, unsigned char *dest);
+
+/**
+ * @brief Convert Ethernet address from raw bytes to string
+ * 
+ * @param src 
+ * @param dest 
+ * @return int 
+ */
+int eth_string_value(unsigned char *src, char *dest);
+
+/**
+ * @brief Return port value from string
+ * 
+ */
+unsigned short port_raw_value(const char *src);
 
 #endif
