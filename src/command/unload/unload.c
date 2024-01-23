@@ -17,8 +17,19 @@ static const char *const usages[] = {
     NULL,
 };
 
+/**
+ * @brief Command description
+ * 
+ */
 static const char *unload_description = "\nUnload a BPF program and unattach it from a network interface.";
 
+/**
+ * @brief Command unload parse
+ * 
+ * @param command 
+ * @param argc 
+ * @param argv 
+ */
 static void command_unload_parse(command_unload_t *command, int argc,
     const char *argv[])
 {
@@ -41,6 +52,14 @@ static void command_unload_parse(command_unload_t *command, int argc,
 
     command->xdp_mode = common_xdp_mode_from_name(xdp_mode_name);
 }
+
+/**
+ * @brief Command unload configure
+ * 
+ * @param argc 
+ * @param argv 
+ * @return command_unload_t 
+ */
 static command_unload_t command_unload_configure(int argc, const char *argv[])
 {
     command_unload_t command = {0};
@@ -49,6 +68,14 @@ static command_unload_t command_unload_configure(int argc, const char *argv[])
 
     return command;
 }
+
+/**
+ * @brief COmmand unload check
+ * 
+ * @param command 
+ * @return true 
+ * @return false 
+ */
 
 static bool command_unload_check(command_unload_t *command)
 {

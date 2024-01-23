@@ -10,6 +10,20 @@
 #include "./filter/filter.h"
 
 /**
+ * @brief Max entry amount
+ * 
+ */
+#define MAP_ENTRY_AMOUNT 128 
+
+#define MAP_CREATE(map_name, key_name) \
+struct { \
+	__uint(type, BPF_MAP_TYPE_HASH); \
+	__type(key, key_name); \
+	__type(value, filter_value_t); \
+	__uint(max_entries, MAP_ENTRY_AMOUNT); \
+} map_name SEC(".maps");
+
+/**
  * @brief License
  * 
  */
@@ -35,45 +49,27 @@ char LICENSE[] SEC("license") = "Dual BSD/GPL";
  * @brief Ethernet filters
  * 
  */
-struct {
-	__uint(type, BPF_MAP_TYPE_HASH);
-	__type(key, filter_key_eth_t);
-	__type(value, filter_value_t);
-	__uint(max_entries, 32);
-} filter_ethernet SEC(".maps");
-
+MAP_CREATE(filter_eth, filter_key_eth_t)
 /**
  * @brief IP filters
  * 
  */
-struct {
-	__uint(type, BPF_MAP_TYPE_HASH);
-	__type(key, filter_key_ip_t);
-	__type(value, filter_value_t);
-	__uint(max_entries, 32);
-} filter_ip SEC(".maps");
-
+MAP_CREATE(filter_ip, filter_key_ip_t)
+/**
+ * @brief IP6 filters
+ * 
+ */
+MAP_CREATE(filter_ip6, filter_key_ip6_t)
 /**
  * @brief TCP/UDP filters
  * 
  */
-struct {
-	__uint(type, BPF_MAP_TYPE_HASH);
-	__type(key, filter_key_port_t);
-	__type(value, filter_value_t);
-	__uint(max_entries, 32);
-} filter_port SEC(".maps");
-
+MAP_CREATE(filter_port, filter_key_port_t)
 /**
  * @brief ICMP filters
  * 
  */
-struct {
-	__uint(type, BPF_MAP_TYPE_HASH);
-	__type(key, filter_key_icmp_t);
-	__type(value, filter_value_t);
-	__uint(max_entries, 32);
-} filter_icmp SEC(".maps");
+MAP_CREATE(filter_icmp, filter_key_icmp_t)
 
 /**
  * @brief Check if there is a match,
@@ -107,7 +103,104 @@ struct {
     COMMON_LOOKUP_MATCH(map, k)
 
 /**
- * @brief Take UDP decision
+ * @brief Take Ethernet decision (layer 2)
+ * 
+ * @param nh 
+ * @param data_end 
+ * @param proto 
+ * @return int
+ */
+static __always_inline int filter_l2(
+    struct hdr_cursor *nh, void *data_end, int *proto)
+{
+    struct ethhdr *eth;
+
+    *proto = parse_ethhdr(nh, data_end, &eth);
+    if (*proto == -1)
+        return XDP_DROP;
+
+    *proto = bpf_htons(*proto);
+
+    filter_key_eth_t k = {0};
+
+    COMMON_CHECK(filter_eth, k, eth->h_source, eth->h_dest)
+    return MATCH_KO;
+}
+
+/**
+ * @brief Take IP decision
+ * 
+ * @param cursor 
+ * @param data_end 
+ * @param proto
+ * @return int 
+ */
+static __always_inline int filter_ip_xdp_action(
+    struct hdr_cursor *nh, void *data_end, int *proto)
+{
+    struct iphdr *ip;
+
+    *proto = parse_iphdr(nh, data_end, &ip);
+    if (*proto == -1)
+        return XDP_DROP;
+
+    filter_key_ip_t k;
+    __u32 src = bpf_ntohl(ip->addrs.saddr);
+    __u32 dst = bpf_ntohl(ip->addrs.daddr);
+
+    COMMON_CHECK(filter_ip, k, &src, &dst)
+    return MATCH_KO;
+}
+
+/**
+ * @brief Take IP6 decision
+ * 
+ * @param cursor 
+ * @param data_end 
+ * @param proto
+ * @return int 
+ */
+static __always_inline int filter_ip6_xdp_action(
+    struct hdr_cursor *nh, void *data_end, int *proto)
+{
+    struct ipv6hdr *ip6;
+
+    *proto = parse_ip6hdr(nh, data_end, &ip6);
+    if (*proto == -1)
+        return XDP_DROP;
+    
+    filter_key_ip6_t k;
+
+    COMMON_CHECK(filter_ip6, k, &ip6->addrs.saddr, &ip6->addrs.daddr)
+    return MATCH_KO;
+}
+
+/**
+ * @brief Filter layer 3
+ * 
+ * @param nh 
+ * @param data_end 
+ * @param proto 
+ * @return int 
+ */
+static __always_inline int filter_l3(
+    struct hdr_cursor *nh, void *data_end, int *proto)
+{
+    switch (*proto)
+    {
+    case ETH_P_IP:
+        return filter_ip_xdp_action(nh, data_end, proto);
+    case ETH_P_IPV6:
+        return filter_ip6_xdp_action(nh, data_end, proto);
+    }
+
+    *proto = -1;
+
+    return XDP_PASS;
+}
+
+/**
+ * @brief Take TCP/UDP decision
  * 
  * @param nh 
  * @param data_end 
@@ -157,81 +250,6 @@ static __always_inline int filter_icmp_xdp_action(
 
     COMMON_LOOKUP_MATCH(filter_icmp, k)
     return MATCH_KO;
-}
-
-/**
- * @brief Take IP decision
- * 
- * @param cursor 
- * @param data_end 
- * @param proto
- * @return int 
- */
-static __always_inline int filter_ip_xdp_action(
-    struct hdr_cursor *nh, void *data_end, int *proto)
-{
-    struct iphdr *ip;
-
-    *proto = parse_iphdr(nh, data_end, &ip);
-    if (*proto == -1)
-        return XDP_DROP;
-
-    filter_key_ip_t k;
-    __u32 src = bpf_ntohl(ip->addrs.saddr);
-    __u32 dst = bpf_ntohl(ip->addrs.daddr);
-
-    COMMON_CHECK(filter_ip, k, &src, &dst)
-    return MATCH_KO;
-}
-
-/**
- * @brief Take Ethernet decision
- * 
- * @param nh 
- * @param data_end 
- * @param proto 
- * @return int
- */
-static __always_inline int filter_l2(
-    struct hdr_cursor *nh, void *data_end, int *proto)
-{
-    struct ethhdr *eth;
-
-    *proto = parse_ethhdr(nh, data_end, &eth);
-    if (*proto == -1)
-        return XDP_DROP;
-
-    *proto = bpf_htons(*proto);
-
-    filter_key_eth_t k = {0};
-
-    COMMON_CHECK(filter_ethernet, k, eth->h_source, eth->h_dest)
-    return MATCH_KO;
-}
-
-/**
- * @brief Filter layer 3
- * 
- * @param nh 
- * @param data_end 
- * @param proto 
- * @return int 
- */
-static __always_inline int filter_l3(
-    struct hdr_cursor *nh, void *data_end, int *proto)
-{
-    switch (*proto)
-    {
-    case ETH_P_IP:
-        return filter_ip_xdp_action(nh, data_end, proto);
-    case ETH_P_IPV6:
-        return MATCH_KO;
-        break;
-    }
-
-    *proto = -1;
-
-    return XDP_PASS;
 }
 
 /**

@@ -9,6 +9,10 @@
 
 #include "./bpf.h"
 
+/**
+ * @brief Pin base directory for BPF maps/objects
+ * 
+ */
 static const char *pin_root_path = "/sys/fs/bpf";
 
 const char *get_pin_root_path()

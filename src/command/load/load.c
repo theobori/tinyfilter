@@ -17,9 +17,25 @@ static const char *const usages[] = {
     NULL,
 };
 
+/**
+ * @brief Command description
+ * 
+ */
 static const char *load_description = "\nLoads a BPF program and attach it to a network interface.";
+
+/**
+ * @brief Default BPF object path
+ * 
+ */
 static const char* bpf_object_file_default = "./src/tinyfilter.bpf.o";
 
+/**
+ * @brief Command load parse
+ * 
+ * @param command 
+ * @param argc 
+ * @param argv 
+ */
 static void command_load_parse(command_load_t *command, int argc,
     const char *argv[])
 {
@@ -46,6 +62,13 @@ static void command_load_parse(command_load_t *command, int argc,
     command->xdp_mode = common_xdp_mode_from_name(xdp_mode_name);
 }
 
+/**
+ * @brief Command load configure
+ * 
+ * @param argc 
+ * @param argv 
+ * @return command_load_t 
+ */
 static command_load_t command_load_configure(int argc, const char *argv[])
 {
     command_load_t command = {0};
@@ -55,6 +78,13 @@ static command_load_t command_load_configure(int argc, const char *argv[])
     return command;
 }
 
+/**
+ * @brief Command load check
+ * 
+ * @param command 
+ * @return true 
+ * @return false 
+ */
 static bool command_load_check(command_load_t *command)
 {
     return command->ifname &&

@@ -11,8 +11,16 @@
 #include "../bpf/bpf.h"
 #include "./xdp.h"
 
+/**
+ * @brief XDP program section name
+ * 
+ */
 static const char* section_name = "xdp";
 
+/**
+ * @brief XDP mode from string
+ * 
+ */
 static const xdp_mode_string_t xdp_mode_strings[] = {
     {"native", XDP_MODE_NATIVE},
     {"skb", XDP_MODE_SKB},

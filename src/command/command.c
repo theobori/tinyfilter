@@ -3,19 +3,9 @@
 
 #include "./command.h"
 #include "./ip/ip.h"
+#include "./ip6/ip6.h"
 #include "./eth/eth.h"
 #include "./port/port.h"
-
-/**
- * @brief Commands port skeleton
- * 
- */
-static command_entry_t commands_port[] = {
-    { "add", command_port_add_process, NULL },
-    { "del", command_port_remove_process, NULL },
-    { "filters", command_port_filters_process, NULL },
-    { "", NULL, NULL },
-};
 
 /**
  * @brief Commands eth skeleton
@@ -24,6 +14,7 @@ static command_entry_t commands_port[] = {
 static command_entry_t commands_eth[] = {
     { "add", command_eth_add_process, NULL },
     { "del", command_eth_remove_process, NULL },
+    { "filters", command_eth_filters_process, NULL },
     { "", NULL, NULL },
 };
 
@@ -39,14 +30,37 @@ static command_entry_t commands_ip[] = {
 };
 
 /**
+ * @brief Commands ip6 skeleton
+ * 
+ */
+static command_entry_t commands_ip6[] = {
+    { "add", command_ip6_add_process, NULL },
+    { "del", command_ip6_remove_process, NULL },
+    { "filters", command_ip6_filters_process, NULL },
+    { "", NULL, NULL },
+};
+
+/**
+ * @brief Commands port skeleton
+ * 
+ */
+static command_entry_t commands_port[] = {
+    { "add", command_port_add_process, NULL },
+    { "del", command_port_remove_process, NULL },
+    { "filters", command_port_filters_process, NULL },
+    { "", NULL, NULL },
+};
+
+/**
  * @brief Commands skeleton
  * 
  */
 static command_entry_t commands[] = {
     { "load", command_load_process, NULL },
     { "unload", command_unload_process, NULL },
-    { "ip", NULL, commands_ip },
     { "eth", NULL, commands_eth },
+    { "ip", NULL, commands_ip },
+    { "ip6", NULL, commands_ip6 },
     { "port", NULL, commands_port },
     { "", NULL, NULL },
 };

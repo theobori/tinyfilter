@@ -104,4 +104,73 @@ command_common_filters_t command_common_filters_configure(int argc,
  */
 bool command_common_filters_check(command_common_filters_t *command);
 
+/**
+ * @brief Generic command filter routine
+ * 
+ */
+#define COMMAND_COMMON_FILTERS(map_name, key_type) \
+    int err, map_fd;\
+    \
+    key_type key, prev_key;\
+    filter_value_t value;\
+\
+    command_common_filters_t cfg = command_common_filters_configure(argc, argv);\
+    if (!command_common_filters_check(&cfg))\
+        return EXIT_FAILURE;\
+\
+    map_fd = common_bpf_pinned_map(cfg.ifname, map_name);\
+    if (map_fd < 0)\
+        return EXIT_FAILURE;\
+    \
+    while (!bpf_map_get_next_key(map_fd, &prev_key, &key)) {\
+        err = bpf_map_lookup_elem(map_fd, &key, &value);\
+        if (err)\
+            continue;\
+\
+        print_filter(&key, &value);\
+\
+        prev_key = key;\
+    }\
+\
+    return EXIT_SUCCESS;
+
+/**
+ * @brief Generic command init routine
+ * 
+ */
+#define __COMMAND_COMMON_PRE(key_type) \
+    int err, map_fd; \
+    key_type k = {0}; \
+\
+    map_fd = command_pre_process(argc, argv, &k); \
+    if (map_fd < 0) \
+        return EXIT_FAILURE;
+
+/**
+ * @brief Generic command add routine
+ * 
+ */
+#define COMMAND_COMMON_ADD(key_type) \
+    __COMMAND_COMMON_PRE(key_type) \
+\
+    filter_value_t v = {0}; \
+\
+    err = bpf_map_update_elem(map_fd, &k, &v, BPF_ANY); \
+    if (err) \
+        return EXIT_FAILURE; \
+\
+    return EXIT_SUCCESS;
+
+/**
+ * @brief Generic command del routine
+ * 
+ */
+#define COMMAND_COMMON_REMOVE(key_type) \
+    __COMMAND_COMMON_PRE(key_type) \
+    err = bpf_map_delete_elem(map_fd, &k); \
+    if (err) \
+        return EXIT_FAILURE; \
+\
+    return EXIT_SUCCESS;
+
 #endif

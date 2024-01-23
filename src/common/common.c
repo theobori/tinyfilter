@@ -13,6 +13,9 @@ int ip_raw_value(int af, const char *src, void *dest, unsigned int size)
     int s;
     char str[INET6_ADDRSTRLEN];
 
+    if (!src || !dest)
+        return EXIT_FAILURE;
+
     s = inet_pton(af, src, buf);
 
     if (s <= 0)

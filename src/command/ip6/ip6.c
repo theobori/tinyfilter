@@ -15,30 +15,30 @@
  * @brief Null comparator
  * 
  */
-static const unsigned char eth_null[ETH_ALEN] = {0};
+static const unsigned char ip6_null[16] = {0};
 
 /**
  * @brief BPF map name
  * 
  */
-static const char map_name[] = "filter_eth";
+static const char map_name[] = "filter_ip6";
 
 /**
- * @brief Filling a BPF eth map struct from CLI values
+ * @brief Filling a BPF ip6 map struct from CLI values
  * 
  * @param k 
  * @param cfg 
  * @return int 
  */
-static int fill(filter_key_eth_t *k, command_common_add_t *cfg)
+static int fill(filter_key_ip6_t *k, command_common_add_t *cfg)
 {
     int err;
 
     if (!cfg || !k)
         return EXIT_FAILURE;
     
-    err = eth_raw_value(cfg->src, k->src);
-    err &= eth_raw_value(cfg->dst, k->dst);
+    err = ip_raw_value(AF_INET6, cfg->src, k->src, sizeof(k->src));
+    err &= ip_raw_value(AF_INET6, cfg->dst, k->dst, sizeof(k->dst));
 
     if (err)
         return EXIT_FAILURE;
@@ -47,7 +47,7 @@ static int fill(filter_key_eth_t *k, command_common_add_t *cfg)
 }
 
 /**
- * @brief Command eth pre process (add/del)
+ * @brief Command ip6 pre process (add/del)
  * 
  * @param argc 
  * @param argv 
@@ -55,7 +55,7 @@ static int fill(filter_key_eth_t *k, command_common_add_t *cfg)
  * @return int 
  */
 static int command_pre_process(int argc, const char *argv[],
-    filter_key_eth_t *k)
+    filter_key_ip6_t *k)
 {
     int err, map_fd;
     command_common_add_t cfg;
@@ -71,7 +71,7 @@ static int command_pre_process(int argc, const char *argv[],
     err = fill(k, &cfg);
     if (err)
         return -1;
-
+    
     return map_fd;
 }
 
@@ -81,18 +81,18 @@ static int command_pre_process(int argc, const char *argv[],
  * @param k 
  * @param v 
  */
-static void print_filter(filter_key_eth_t *k, filter_value_t *v)
+static void print_filter(filter_key_ip6_t *k, filter_value_t *v)
 {
-    char str[ETH_STR_LEN];
-    bool is_src = memcmp(k->src, eth_null, sizeof(k->src));
+    char str[INET6_ADDRSTRLEN];
+    bool is_src = memcmp(k->src, ip6_null, sizeof(k->src));
 
     if (is_src) {
-        eth_string_value(k->src, str);
+        ip_string_value(AF_INET6, (char *) &k->src, str);
         printf("From %s", str);
     }
 
-    if (memcmp(k->dst, eth_null, sizeof(k->dst))) {
-        eth_string_value(k->dst, str);
+    if (memcmp(k->dst, ip6_null, sizeof(k->dst))) {
+        ip_string_value(AF_INET6, (char *) &k->dst, str);
 
         if (is_src)
             printf(" to ");
@@ -105,17 +105,17 @@ static void print_filter(filter_key_eth_t *k, filter_value_t *v)
     printf(", %llu matches\n", v->count);
 }
 
-int command_eth_add_process(int argc, const char *argv[])
+int command_ip6_add_process(int argc, const char *argv[])
 {
-    COMMAND_COMMON_ADD(filter_key_eth_t)
+    COMMAND_COMMON_ADD(filter_key_ip6_t)
 }
 
-int command_eth_remove_process(int argc, const char *argv[])
+int command_ip6_remove_process(int argc, const char *argv[])
 {
-    COMMAND_COMMON_REMOVE(filter_key_eth_t)
+    COMMAND_COMMON_REMOVE(filter_key_ip6_t)
 }
 
-int command_eth_filters_process(int argc, const char *argv[])
+int command_ip6_filters_process(int argc, const char *argv[])
 {
-    COMMAND_COMMON_FILTERS(map_name, filter_key_eth_t)
+    COMMAND_COMMON_FILTERS(map_name, filter_key_ip6_t)
 }

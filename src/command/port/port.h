@@ -1,6 +1,10 @@
 #ifndef __COMMAND_PORT_H__
 #define __COMMAND_PORT_H__
 
+/**
+ * @brief Command port add CLI arguments representation
+ * 
+ */
 typedef struct command_port_add_s {
     char *ifname;
     char *src;

@@ -3,9 +3,16 @@
 
 #include <linux/types.h>
 
-
+/**
+ * @brief Ethernet string representation length
+ * 
+ */
 #define ETH_STR_LEN 18
 
+/**
+ * @brief Compute static array length 
+ * 
+*/
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 /**
