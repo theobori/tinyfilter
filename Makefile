@@ -29,7 +29,7 @@ CFLAGS = -Wall -g
 all: $(TARGET) $(BPF_OBJ)
 
 $(TARGET): $(USER_OBJ)
-	$(CC) -Wall -o $(TARGET) $(USER_OBJ) -lbpf -lelf -lz -lcyaml -lxdp
+	$(CC) -Wall -o $(TARGET) $(USER_OBJ) -lbpf -lelf -lz -lxdp
 
 $(BPF_OBJ): %.o: $(BPF_C)
 	$(CC) \
