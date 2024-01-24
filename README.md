@@ -111,5 +111,5 @@ Now everything is setup, you can run the XDP program inside the first network na
 ## 🎉 Tasks
 
 - [x] Resolve layer 4 protocols strings
-- [ ] Implement ICMP filters
+- [x] Implement ICMP filters
 - [ ] Unpin maps at unload by network interface name

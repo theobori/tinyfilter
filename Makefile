@@ -15,6 +15,7 @@ USER_C = $(SRC_DIR)/main.c \
 		 $(SRC_DIR)/command/ip6/ip6.c \
 		 $(SRC_DIR)/command/eth/eth.c \
 		 $(SRC_DIR)/command/port/port.c \
+		 $(SRC_DIR)/command/icmp/icmp.c \
 		 $(SRC_DIR)/common/common.c \
 		 $(SRC_DIR)/common/bpf/bpf.c \
 		 $(SRC_DIR)/common/xdp/xdp.c

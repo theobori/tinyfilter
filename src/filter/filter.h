@@ -48,7 +48,7 @@ typedef struct filter_key_port_s {
  * 
  */
 typedef struct filter_key_icmp_s {
-    __u8 type;
+    __u8 code;
     __u8 unused[3];
 } filter_key_icmp_t;
 

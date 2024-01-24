@@ -122,8 +122,8 @@ static __always_inline int filter_l2(
     *proto = bpf_htons(*proto);
 
     filter_key_eth_t k = {0};
-
     COMMON_CHECK(filter_eth, k, eth->h_source, eth->h_dest)
+
     return MATCH_KO;
 }
 
@@ -144,11 +144,13 @@ static __always_inline int filter_ip_xdp_action(
     if (*proto == -1)
         return XDP_DROP;
 
-    filter_key_ip_t k;
+    filter_key_ip_t k = {0};
+
     __u32 src = bpf_ntohl(ip->addrs.saddr);
     __u32 dst = bpf_ntohl(ip->addrs.daddr);
 
     COMMON_CHECK(filter_ip, k, &src, &dst)
+
     return MATCH_KO;
 }
 
@@ -169,9 +171,9 @@ static __always_inline int filter_ip6_xdp_action(
     if (*proto == -1)
         return XDP_DROP;
     
-    filter_key_ip6_t k;
-
+    filter_key_ip6_t k = {0};
     COMMON_CHECK(filter_ip6, k, &ip6->addrs.saddr, &ip6->addrs.daddr)
+
     return MATCH_KO;
 }
 
@@ -218,6 +220,7 @@ static __always_inline int filter_udp_xdp_action(
 	nh->pos = udp + 1;
     
     filter_key_port_t k = {0};
+
     k.proto = proto;
 
     __u16 src = bpf_ntohs(udp->source);
@@ -245,8 +248,9 @@ static __always_inline int filter_icmp_xdp_action(
     if (t == -1)
         return XDP_DROP;
     
-    filter_key_icmp_t k;
-    k.type = t;
+    filter_key_icmp_t k = {0};
+
+    k.code = icmp->code;
 
     COMMON_LOOKUP_MATCH(filter_icmp, k)
     return MATCH_KO;

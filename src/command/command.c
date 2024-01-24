@@ -6,6 +6,7 @@
 #include "./ip6/ip6.h"
 #include "./eth/eth.h"
 #include "./port/port.h"
+#include "./icmp/icmp.h"
 
 /**
  * @brief Commands eth skeleton
@@ -52,6 +53,17 @@ static command_entry_t commands_port[] = {
 };
 
 /**
+ * @brief Commands icmp skeleton
+ * 
+ */
+static command_entry_t commands_icmp[] = {
+    { "add", command_icmp_add_process, NULL },
+    { "del", command_icmp_remove_process, NULL },
+    { "filters", command_icmp_filters_process, NULL },
+    { "", NULL, NULL },
+};
+
+/**
  * @brief Commands skeleton
  * 
  */
@@ -62,6 +74,7 @@ static command_entry_t commands[] = {
     { "ip", NULL, commands_ip },
     { "ip6", NULL, commands_ip6 },
     { "port", NULL, commands_port },
+    { "icmp", NULL, commands_icmp },
     { "", NULL, NULL },
 };
 
