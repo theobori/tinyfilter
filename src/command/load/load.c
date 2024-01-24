@@ -27,7 +27,7 @@ static const char *load_description = "\nLoads a BPF program and attach it to a 
  * @brief Default BPF object path
  * 
  */
-static const char* bpf_object_file_default = "./src/tinyfilter.bpf.o";
+static const char* bpf_object_file_default = "./src/tinyfilter_drop.bpf.o";
 
 /**
  * @brief Command load parse

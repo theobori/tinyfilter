@@ -90,6 +90,12 @@ Now everything is setup, you can run the XDP program inside the first network na
 ./tinyfilter load -i veth1
 ```
 
+#### Load the XDP program with the XDP_PASS return value
+
+```bash
+./tinyfilter load -i veth1 -b ./src/tinyfilter_pass.bpf.o
+```
+
 #### Allow TCP from port 10001 to 10002
 
 ```bash
@@ -112,4 +118,5 @@ Now everything is setup, you can run the XDP program inside the first network na
 
 - [x] Resolve layer 4 protocols strings
 - [x] Implement ICMP filters
+- [x] Two programs for two default policy (allow / drop)
 - [ ] Unpin maps at unload by network interface name
