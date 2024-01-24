@@ -96,19 +96,19 @@ Now everything is setup, you can run the XDP program inside the first network na
 ./tinyfilter load -i veth1 -b ./src/tinyfilter_pass.bpf.o
 ```
 
-#### Allow TCP from port 10001 to 10002
+#### Filter for TCP from port 10001 to 10002
 
 ```bash
 ./tinyfilter port add -i veth1 --src 10001 --dst 10002 -p tcp
 ```
 
-#### Allow SSH port
+#### Filter for SSH port
 
 ```bash
 ./tinyfilter port add -i veth1 --dst 22 -p tcp
 ```
 
-#### Allow IPv6 address fe80::9c0c:93ff:fe18:7d1d
+#### Filter for IPv6 address fe80::9c0c:93ff:fe18:7d1d
 
 ```bash
 ./tinyfilter ip6 add -i veth1 --src fe80::9c0c:93ff:fe18:7d1d
