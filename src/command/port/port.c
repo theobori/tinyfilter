@@ -28,27 +28,6 @@ static const char *const common_usages[] = {
 };
 
 /**
- * @brief Get the layer 4 protocol linux value from string
- * 
- * @param src 
- * @param dest 
- * @return signed short 
- */
-static unsigned char l4_proto_value(char *src)
-{
-    if (!src)
-        return 0;
-    
-    if (!strcmp(src, "udp"))
-        return IPPROTO_UDP;
-
-    if (!strcmp(src, "tcp"))
-        return IPPROTO_TCP;
-
-    return 0;
-}
-
-/**
  * @brief Command port add parse
  * 
  * @param command 
@@ -117,10 +96,15 @@ static bool command_port_add_check(command_port_add_t *command)
  */
 static int fill(filter_key_port_t *k, command_port_add_t *cfg)
 {
+    int err;
+
     if (!cfg || !k)
         return EXIT_FAILURE;
     
-    k->proto = l4_proto_value(cfg->proto);
+    err = l4_proto_resolve(cfg->proto, &k->proto, VALUE);
+    if (err)
+        return EXIT_FAILURE;
+    
     if (!k->proto)
         return EXIT_FAILURE;
     
@@ -170,14 +154,21 @@ static int command_pre_process(int argc, const char *argv[],
  */
 static void print_filter(filter_key_port_t *k, filter_value_t *v)
 {
+    int err;
+    char name[10];
+
+    err = l4_proto_resolve(name, &k->proto, NAME);
+    if (err)
+        return;
+
     if (k->src)
-        printf("Protocol %hu, from %hu", k->proto, k->src);
+        printf("Protocol %s, from %hu", name, k->src);
 
     if (k->dst) {
         if (k->src)
             printf(" to ");
         else
-            printf("Protocol %hu, To ", k->proto);
+            printf("Protocol %s, To ", name);
 
         printf("%hu", k->dst);
     }
