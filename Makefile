@@ -42,12 +42,12 @@ $(BPF_OBJ): %.o: %.c
 	llvm-strip -g $@
 
 clean:
-	$(RM) \
-		$(BPF_OBJ) \
-		$(USER_OBJ) \
+	$(RM) $(USER_OBJ)
 
 fclean: clean
-	$(RM) $(TARGET)
+	$(RM) \
+		$(BPF_OBJ) \
+		$(TARGET)
 
 re: fclean all
 

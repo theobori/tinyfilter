@@ -90,6 +90,12 @@ Now everything is setup, you can run the XDP program inside the first network na
 ./tinyfilter load -i veth1
 ```
 
+If you this error `libxdp: No bpffs found at /sys/fs/bpf`, you can mount the filesystem using the following command.
+
+```bash
+mount -t bpf bpf /sys/fs/bpf/
+```
+
 #### Load the XDP program with the XDP_PASS return value
 
 ```bash
