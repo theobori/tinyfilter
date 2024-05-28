@@ -1,6 +1,6 @@
 # 🐝 tinyfilter
 
-eBPF (XDP) packet filter for the layer 2, 3 and 4.
+eBPF (XDP) packet filtering for OSI model layers 2, 3 and 4.
 
 
 The filtering mechanism is inspired by [Berkeley packet filters](https://www.ibm.com/docs/en/qsip/7.4?topic=queries-berkeley-packet-filters) but in a simpler way.
