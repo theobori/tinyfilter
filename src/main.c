@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
 #include <net/if.h>
-#include <errno.h>
-#include <signal.h>
 
 #include <xdp/libxdp.h>
 #include <bpf/libbpf.h>

@@ -5,9 +5,6 @@
 
 #include "../../argparse/argparse.h"
 #include "./common.h"
-#include "../../common/bpf/bpf.h"
-#include "../../filter/filter.h"
-#include "../../command/command.h"
 
 #include <xdp/libxdp.h>
 

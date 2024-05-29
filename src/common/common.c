@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <net/ethernet.h>
-#include <errno.h>
 #include <stdio.h>
 
 #include "./common.h"

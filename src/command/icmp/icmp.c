@@ -6,7 +6,6 @@
 #include "../../argparse/argparse.h"
 #include "../../common/bpf/bpf.h"
 #include "../../filter/filter.h"
-#include "../../command/command.h"
 #include "../common/common.h"
 #include "./icmp.h"
 
