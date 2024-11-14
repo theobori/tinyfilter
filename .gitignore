@@ -60,3 +60,7 @@ vmlinux.h
 
 # Visual Studio Code
 .vscode
+
+# Nix
+.direnv
+result

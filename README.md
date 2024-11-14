@@ -1,11 +1,15 @@
-# 🐝 tinyfilter
+# tinyfilter
+
+[![build](https://github.com/theobori/tinyfilter/actions/workflows/build.yml/badge.svg)](https://github.com/theobori/tinyfilter/actions/workflows/build.yml)
+
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 eBPF (XDP) packet filtering for OSI model layers 2, 3 and 4.
 
 
 The filtering mechanism is inspired by [Berkeley packet filters](https://www.ibm.com/docs/en/qsip/7.4?topic=queries-berkeley-packet-filters) but in a simpler way.
 
-## 📖 Build and run
+## Build and run
 
 You only need the following requirements (packages):
 - `llvm`
@@ -37,11 +41,11 @@ Then you can run.
 ./tinyfilter help
 ```
 
-## 🤝 Contribute
+## Contribute
 
 If you want to help the project, you can follow the guidelines in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## 📏 Filters
+## Filters
 
 There are multiple available filters, addresse and port can be source or/and dest.
 
@@ -55,7 +59,7 @@ There are multiple available filters, addresse and port can be source or/and des
   - UDP (ports)
   - ICMP (type)
 
-## ⭐ Use cases
+## Use cases
 
 To test the program, I have created two Linux network namespaces (both reachable by each other) following [this steps](https://medium.com/@technbd/creating-network-namespaces-in-linux-system-and-connecting-two-network-namespaces-using-virtual-6031d295f69b).
 
@@ -82,7 +86,7 @@ ip netns exec ns2 ip link set dev veth2 up
 
 Now everything is setup, you can run the XDP program inside the first network namespace and play with filters.
 
-## 📎 Some examples
+## Some examples
 
 #### Load the XDP program
 
@@ -120,7 +124,7 @@ mount -t bpf bpf /sys/fs/bpf/
 ./tinyfilter ip6 add -i veth1 --src fe80::9c0c:93ff:fe18:7d1d
 ```
 
-## 🎉 Tasks
+## Tasks
 
 - [x] Resolve layer 4 protocols strings
 - [x] Implement ICMP filters
